@@ -1,0 +1,45 @@
+# Contexto
+> O Documento possui uma descrição do contexto do repositório.
+
+## Arquitetura
+
+Monorepo
+
+Arquitetura **DDD - Domain driven development**
+
+
+## Stack
+
+- [Node.js](https://nodejs.org/docs/latest/api/)
+- [Sentry SDK](https://develop.sentry.dev/sdk/getting-started/)
+- [React v19.2](https://react.dev/reference/react)
+- [TailwindCSS v4.3](https://tailwindcss.com/docs)
+- [Next.js v16.2.12 App](https://nextjs.org/docs) - Dashboard
+- [Supabase](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs)
+
+## Integrações
+
+- [Runrunit](https://runrun.it/api/documentation)
+- [Discord](https://docs.discord.com/developers/intro)
+
+## Soluções
+
+Monitoramento proativo de vários ecommerce com aberturas de ticket dentro da plataforma agilizando o processo de descoberta e correção.
+
+Hoje toda a abertura de tickets está centralizado no cliente que perde o foco da gestão do ecommerce para procurar erros ou notificar a equipe de desenvolvimento que um cliente não conseguiu efetuar uma operação no site. O erro as vezes pode ser uma API indisponível, um erro no Gateway de pagamentos entre 'N' coisas, até o cliente abrir o ticket e o desenvolvedor investigar a demanda pode haver mais erros e mais clientes frustados.
+
+Liberar a atenção do comerciante para cuidar e focar no negócio, permitindo que ele também consiga solicitar novas `features` já que não estará procurando erros.
+
+Auxiliar a equipe técnica na descoberta de erros durante a jornada do usuário, seja por um cenário de teste não contemplado ou por um cenário atipico.
+
+## Problemas
+
+- Gestores de ecommerce, precisam abrir os tickets, custa tempo, abertura de ticket, preenchimento de informações e explicações longas.
+
+- Muitas reclamações nas plataformas como "Reclame Aqui", durante a identificação e correção os clientes podem continuar sofrendo e repetindo os erros e isso aumenta a frustação e também o número de queixas em plataformas de avaliações.
+
+- Falta de atividades nas filas, as agências que cuidam e gerenciam esses projetos ficam tempo ociosas e com isso não atingem o pacote de horas mensais e com isso o cliente acaba pagando e não utilizando.
+
+## Equipe
+
+**Project Lead** - [Neto - Dev](mailto:netoflavio97@hotmail.com)

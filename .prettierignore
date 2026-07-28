@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+build
+.next
+out
+*.lock
+package-lock.json
+pnpm-lock.yaml
+docs/architecture
+.spec
+.cursor
+*.tsbuildinfo

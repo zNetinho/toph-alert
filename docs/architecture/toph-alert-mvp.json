@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "toph-alert MVP",
+    "subtitle": "SDK browser → ingest → dedupe → Runrunit → Discord — monorepo DDD",
+    "output": "toph-alert-mvp.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "error-path",
+        "label": "Captura e ticket",
+        "focus": ["storefront-sdk", "ingest-api", "error-pipeline", "runrunit", "discord"],
+        "note": "Erro na loja até ticket Runrunit e alerta Discord."
+      },
+      {
+        "id": "data-tenant",
+        "label": "Persistência e tenant",
+        "focus": ["ingest-api", "error-pipeline", "supabase-db", "supabase-auth"],
+        "note": "RLS por cliente_id; dedupe scoped por loja_id."
+      },
+      {
+        "id": "dashboard-ops",
+        "label": "Painéis e observabilidade",
+        "focus": ["dashboard-web", "supabase-auth", "supabase-db", "sentry-obs"],
+        "note": "Assinante e admin leem erros; Sentry só na app Next."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "storefront-sdk",
+      "type": "external",
+      "label": "Browser SDK",
+      "sublabel": "@toph-alert/browser-sdk",
+      "pos": [40, 280],
+      "size": [130, 60],
+      "tag": "Lojas ecommerce"
+    },
+    {
+      "id": "dashboard-web",
+      "type": "frontend",
+      "label": "Dashboard Web",
+      "sublabel": "Next.js 16 App Router",
+      "pos": [40, 480],
+      "size": [130, 60],
+      "tag": "apps/web"
+    },
+    {
+      "id": "supabase-auth",
+      "type": "security",
+      "label": "Supabase Auth",
+      "sublabel": "admin + assinante",
+      "pos": [220, 100],
+      "size": [130, 64],
+      "tag": "RLS"
+    },
+    {
+      "id": "ingest-api",
+      "type": "backend",
+      "label": "Ingest API",
+      "sublabel": "POST /api/ingest",
+      "pos": [250, 280],
+      "size": [130, 60]
+    },
+    {
+      "id": "error-pipeline",
+      "type": "backend",
+      "label": "Error Pipeline",
+      "sublabel": "dedupe + ticket + notify",
+      "pos": [460, 280],
+      "size": [140, 60],
+      "tag": "packages/domain"
+    },
+    {
+      "id": "supabase-db",
+      "type": "database",
+      "label": "Supabase DB",
+      "sublabel": "Cliente · Loja · Erro · Ticket",
+      "pos": [460, 480],
+      "size": [140, 60]
+    },
+    {
+      "id": "runrunit",
+      "type": "external",
+      "label": "Runrunit",
+      "sublabel": "task API",
+      "pos": [700, 280],
+      "size": [120, 60],
+      "tag": "fase 1"
+    },
+    {
+      "id": "discord",
+      "type": "external",
+      "label": "Discord",
+      "sublabel": "webhook",
+      "pos": [900, 280],
+      "size": [120, 60]
+    },
+    {
+      "id": "sentry-obs",
+      "type": "external",
+      "label": "Sentry",
+      "sublabel": "monitoring-ecommerces",
+      "pos": [640, 420],
+      "size": [120, 60],
+      "tag": "app-only"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Lojas ecommerce (Shopify, VTEX, …)",
+      "wraps": ["storefront-sdk"]
+    },
+    {
+      "kind": "region",
+      "label": "apps/web — Next.js dashboard",
+      "wraps": ["dashboard-web", "ingest-api", "error-pipeline"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Supabase — tenant isolation",
+      "wraps": ["supabase-db", "supabase-auth"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "sdk-to-ingest",
+      "from": "storefront-sdk",
+      "to": "ingest-api",
+      "label": "store_key + tags",
+      "variant": "emphasis",
+      "labelDy": 54
+    },
+    {
+      "id": "ingest-to-pipeline",
+      "from": "ingest-api",
+      "to": "error-pipeline"
+    },
+    {
+      "id": "ingest-to-db",
+      "from": "ingest-api",
+      "to": "supabase-db",
+      "label": "upsert Erro",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "via": [[315, 440], [420, 440], [420, 510]],
+      "labelAt": [347, 430]
+    },
+    {
+      "id": "pipeline-to-runrunit",
+      "from": "error-pipeline",
+      "to": "runrunit",
+      "label": "create task",
+      "variant": "emphasis",
+      "labelDy": -28
+    },
+    {
+      "id": "pipeline-to-discord",
+      "from": "error-pipeline",
+      "to": "discord",
+      "label": "notify devs",
+      "fromSide": "top",
+      "toSide": "top",
+      "via": [[530, 170], [960, 170]]
+    },
+    {
+      "id": "dashboard-to-auth",
+      "from": "dashboard-web",
+      "to": "supabase-auth",
+      "label": "login",
+      "variant": "security",
+      "fromSide": "left",
+      "toSide": "bottom",
+      "via": [[20, 510], [20, 180], [285, 180]],
+      "labelAt": [150, 168]
+    },
+    {
+      "id": "dashboard-to-db",
+      "from": "dashboard-web",
+      "to": "supabase-db",
+      "label": "erros + tickets",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "web-to-sentry",
+      "from": "dashboard-web",
+      "to": "sentry-obs",
+      "label": "errors + traces",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "via": [[105, 570], [105, 620], [700, 620], [700, 400]]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Captura MVP",
+      "items": [
+        "SDK browser nas lojas — não Sentry nas storefronts",
+        "Auth ingest via store_key; tags loja + cliente + plataforma",
+        "Dedupe por fingerprint scoped por loja_id"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Pipeline",
+      "items": [
+        "Runrunit only na v1; Jira/Monday/Linear fase 2",
+        "Discord webhook após ticket criado",
+        "Erro: novo → ticket_aberto → resolvido"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Tenant & roles",
+      "items": [
+        "Cliente 1—N Loja; RLS por cliente_id",
+        "Roles admin (global) e assinante (por cliente)",
+        "Sentry observa só o dashboard Next"
+      ]
+    }
+  ]
+}
