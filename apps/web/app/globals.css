@@ -1,26 +1,105 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+}
+
+:root,
+.dark {
+  --bg: #0b1227;
+  --surface: #0d1f5b;
+  --surface-elevated: #06144f;
+  --text: #ffffff;
+  --text-muted: #c8cedb;
+  --accent: #36cad8;
+  --accent-fg: #020e0f;
+  --cta: #f6ab00;
+  --cta-fg: #0d1f5b;
+  --border: rgba(255, 255, 255, 0.2);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --success: #2e7b3f;
+  --warning: #e5b22d;
+  --danger: #da452c;
+  --overlay: rgba(11, 18, 39, 0.8);
+  --shadow: none;
+}
+
+.light {
+  color-scheme: light;
+
+  --bg: #f8f8f8;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --text: #0d1f5b;
+  --text-muted: #585858;
+  --accent: #36cad8;
+  --accent-fg: #020e0f;
+  --cta: #f6ab00;
+  --cta-fg: #0d1f5b;
+  --border: #c7c7c7;
+  --border-subtle: #e8e8e8;
+  --success: #2e7b3f;
+  --warning: #e5b22d;
+  --danger: #da452c;
+  --overlay: rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-cta: var(--cta);
+  --color-cta-fg: var(--cta-fg);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-overlay: var(--overlay);
+
+  --font-display: 'Archimoto', var(--font-montserrat), 'Montserrat', sans-serif;
+  --font-body: var(--font-montserrat), 'Montserrat', var(--font-noto-sans), 'Noto Sans', sans-serif;
+  --font-content: var(--font-noto-sans), 'Noto Sans', sans-serif;
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --text-display-l: 2.5rem;
+  --text-h2: 2rem;
+  --text-stat: 2rem;
+  --text-h3: 1.875rem;
+  --text-h3-sub: 1.25rem;
+  --text-body-lg: 1.125rem;
+  --text-body: 1rem;
+  --text-nav: 1rem;
+  --text-cta-size: 0.875rem;
+  --text-caption: 0.75rem;
+
+  --radius-card: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (prefers-reduced-motion: no-preference) {
+  body {
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
