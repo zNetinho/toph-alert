@@ -16,6 +16,8 @@ import type {
   NotifyInput,
   NotifyPort,
   NotifyResult,
+  SaveTicketInput,
+  SavedTicket,
   TicketPort,
   UpsertErroInput,
   UpsertErroResult,
@@ -30,22 +32,30 @@ export type DomainPorts = {
 
 /** Stub ticket adapter — replaced by Runrunit in T07. */
 export const stubTicketPort: TicketPort = {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   async createTicket(_input: CreateTicketInput): Promise<CreateTicketResult> {
-    return { externalId: 'stub-ticket', statusCode: 200 };
+    return { externalId: `stub-ticket-${crypto.randomUUID()}`, statusCode: 200 };
   },
 };
 
 /** Stub notify adapter — replaced by Discord in T08. */
 export const stubNotifyPort: NotifyPort = {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   async notify(_input: NotifyInput): Promise<NotifyResult> {
     return { ok: true, statusCode: 204 };
   },
 };
 
-/** In-memory ErrorStore stub — used when Supabase admin env is absent. */
-export function createStubErrorStore(): ErrorStore {
+/** In-memory ErrorStore stub — used when Supabase admin env is absent / unit tests. */
+export function createStubErrorStore(seed?: { lojas?: Loja[] }): ErrorStore {
   const lojas = new Map<string, Loja>();
   const erros = new Map<ErroId, Erro>();
+  const tickets = new Map<ErroId, SavedTicket>();
+  const outbox: EnqueueOutboxInput[] = [];
+
+  for (const loja of seed?.lojas ?? []) {
+    lojas.set(loja.storeKey, loja);
+  }
 
   return {
     async findLojaByStoreKey(storeKey: string) {
@@ -117,8 +127,23 @@ export function createStubErrorStore(): ErrorStore {
       return updated;
     },
 
-    async enqueueOutbox(_input: EnqueueOutboxInput) {
-      // no-op until outbox persistence (T05)
+    async enqueueOutbox(input: EnqueueOutboxInput) {
+      outbox.push(input);
+    },
+
+    async saveTicket(input: SaveTicketInput) {
+      const saved: SavedTicket = {
+        erroId: input.erroId,
+        externalId: input.externalId,
+        provider: input.provider ?? 'runrunit',
+        title: input.title,
+      };
+      tickets.set(input.erroId, saved);
+      return saved;
+    },
+
+    async findTicketByErroId(erroId: ErroId) {
+      return tickets.get(erroId) ?? null;
     },
   };
 }
@@ -132,7 +157,7 @@ export function createDomainPorts(): DomainPorts {
 }
 
 /**
- * Helper used by future ingest route — fingerprint from payload at the boundary.
+ * Helper used by ingest route — fingerprint from payload at the boundary.
  */
 export function fingerprintFromIngest(payload: IngestPayload) {
   return computeFingerprint(payload);

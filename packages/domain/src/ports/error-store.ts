@@ -22,9 +22,24 @@ export type EnqueueOutboxInput = {
   payload?: Record<string, unknown>;
 };
 
+export type SaveTicketInput = {
+  erroId: ErroId;
+  externalId: string;
+  provider?: string;
+  title?: string;
+  raw?: unknown;
+};
+
+export type SavedTicket = {
+  erroId: ErroId;
+  externalId: string;
+  provider: string;
+  title?: string;
+};
+
 /**
- * Persistence port for lojas, erros, and outbox enqueue.
- * Supabase adapter will live in `apps/web` — domain stays store-agnostic.
+ * Persistence port for lojas, erros, tickets, and outbox enqueue.
+ * Supabase adapter lives in `apps/web` — domain stays store-agnostic.
  */
 export interface ErrorStore {
   findLojaByStoreKey(storeKey: string): Promise<Loja | null>;
@@ -43,4 +58,8 @@ export interface ErrorStore {
   updateErroStatus(erroId: ErroId, status: ErroStatus): Promise<Erro>;
 
   enqueueOutbox(input: EnqueueOutboxInput): Promise<void>;
+
+  saveTicket(input: SaveTicketInput): Promise<SavedTicket>;
+
+  findTicketByErroId(erroId: ErroId): Promise<SavedTicket | null>;
 }

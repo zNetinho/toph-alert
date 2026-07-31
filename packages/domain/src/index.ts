@@ -29,7 +29,18 @@ export type {
   UpsertErroInput,
   UpsertErroResult,
   EnqueueOutboxInput,
+  SaveTicketInput,
+  SavedTicket,
 } from './ports/error-store';
 
 export type { FingerprintSource } from './fingerprint/compute-fingerprint';
 export { computeFingerprint } from './fingerprint/compute-fingerprint';
+
+export type {
+  ErrorPipelineDeps,
+  ProcessCreateTicketOptions,
+  ProcessCreateTicketResult,
+  ProcessNotifyOptions,
+  ProcessNotifyResult,
+} from './pipeline/error-pipeline';
+export { ErrorPipeline, createErrorPipeline } from './pipeline/error-pipeline';

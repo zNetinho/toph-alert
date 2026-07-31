@@ -183,6 +183,52 @@ export function createSupabaseErrorStore(
 
       if (error) throw new Error(`enqueueOutbox: ${error.message}`);
     },
+
+    async saveTicket(input) {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('tickets')
+        .upsert(
+          {
+            erro_id: input.erroId,
+            external_id: input.externalId,
+            provider: input.provider ?? 'runrunit',
+            title: input.title ?? null,
+            raw: toJson(input.raw),
+          },
+          { onConflict: 'erro_id' },
+        )
+        .select('erro_id, external_id, provider, title')
+        .single();
+
+      if (error) throw new Error(`saveTicket: ${error.message}`);
+
+      return {
+        erroId: data.erro_id,
+        externalId: data.external_id,
+        provider: data.provider,
+        title: data.title ?? undefined,
+      };
+    },
+
+    async findTicketByErroId(erroId) {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('tickets')
+        .select('erro_id, external_id, provider, title')
+        .eq('erro_id', erroId)
+        .maybeSingle();
+
+      if (error) throw new Error(`findTicketByErroId: ${error.message}`);
+      if (!data) return null;
+
+      return {
+        erroId: data.erro_id,
+        externalId: data.external_id,
+        provider: data.provider,
+        title: data.title ?? undefined,
+      };
+    },
   };
 }
 

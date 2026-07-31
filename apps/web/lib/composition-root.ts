@@ -1,7 +1,9 @@
 /**
- * Composition root — single factory for domain ports used by ingest, worker, and pipeline.
+ * Composition root — single factory for domain ports + pipeline used by ingest/worker.
  * Adapters swap here; callers never construct HTTP clients inline.
  */
+
+import { createErrorPipeline, type ErrorPipeline } from '@toph-alert/domain';
 
 import type { DomainPorts } from '@/lib/domain-ports';
 import { createStubErrorStore, stubNotifyPort, stubTicketPort } from '@/lib/domain-ports';
@@ -10,11 +12,15 @@ import { isSupabaseAdminConfigured } from '@/lib/supabase/env';
 
 export type { DomainPorts };
 
+export type CompositionRoot = DomainPorts & {
+  pipeline: ErrorPipeline;
+};
+
 /**
  * Builds wired ports for the current process.
- * Uses Supabase ErrorStore when service role is configured; otherwise in-memory stub (local compile).
+ * Uses Supabase ErrorStore when service role is configured; otherwise in-memory stub.
  */
-export function createCompositionRoot(): DomainPorts {
+export function createCompositionRoot(): CompositionRoot {
   const errors = isSupabaseAdminConfigured() ? createSupabaseErrorStore() : createStubErrorStore();
 
   if (!isSupabaseAdminConfigured()) {
@@ -23,19 +29,33 @@ export function createCompositionRoot(): DomainPorts {
     );
   }
 
-  return {
+  const ports: DomainPorts = {
     tickets: stubTicketPort,
     notify: stubNotifyPort,
     errors,
   };
+
+  return {
+    ...ports,
+    pipeline: createErrorPipeline(ports),
+  };
 }
 
-let cached: DomainPorts | null = null;
+let cached: CompositionRoot | null = null;
 
 /** Lazy singleton for route handlers / workers in the same isolate. */
-export function getDomainPorts(): DomainPorts {
+export function getCompositionRoot(): CompositionRoot {
   if (!cached) {
     cached = createCompositionRoot();
   }
   return cached;
+}
+
+export function getDomainPorts(): DomainPorts {
+  const root = getCompositionRoot();
+  return {
+    tickets: root.tickets,
+    notify: root.notify,
+    errors: root.errors,
+  };
 }
