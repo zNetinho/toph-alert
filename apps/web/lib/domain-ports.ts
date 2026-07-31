@@ -1,7 +1,6 @@
 /**
- * Compile-time wiring surface for domain ports.
- * Real adapters (Supabase / Runrunit / Discord) are registered in later tasks;
- * this module proves `apps/web` can type ingest/worker against `@toph-alert/domain`.
+ * Compile-time wiring stubs for domain ports.
+ * Runtime wiring lives in `lib/composition-root.ts` (T05+).
  */
 
 import type {
@@ -43,7 +42,7 @@ export const stubNotifyPort: NotifyPort = {
   },
 };
 
-/** In-memory ErrorStore stub — replaced by Supabase in T03/T05. */
+/** In-memory ErrorStore stub — used when Supabase admin env is absent. */
 export function createStubErrorStore(): ErrorStore {
   const lojas = new Map<string, Loja>();
   const erros = new Map<ErroId, Erro>();
