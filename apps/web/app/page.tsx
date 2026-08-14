@@ -1,12 +1,15 @@
 import { DOMAIN_PACKAGE, computeFingerprint, type IngestPayload } from '@toph-alert/domain';
-import { BROWSER_SDK_PACKAGE } from '@toph-alert/browser-sdk';
-import { INTEGRATIONS_PACKAGE } from '@toph-alert/integrations';
 import { DashboardShell } from '@/components/dashboard-shell';
 import { fingerprintFromIngest } from '@/lib/domain-ports';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 import { smokeSchemaReadWrite } from '@/lib/supabase/schema-smoke';
 
-const workspacePackages = [DOMAIN_PACKAGE, BROWSER_SDK_PACKAGE, INTEGRATIONS_PACKAGE] as const;
+/** Workspace packages (names only — no imports from integrations/sdk outside composition root). */
+const workspacePackages = [
+  DOMAIN_PACKAGE,
+  '@toph-alert/browser-sdk',
+  '@toph-alert/integrations',
+] as const;
 
 const samplePayload: IngestPayload = {
   storeKey: 'demo-store',
